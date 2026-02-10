@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+.env
+*.egg-info/
+
+# Data and cache
+data/shorts.db
+data/thumbnails/
+data/downloads/
+output/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Streamlit
+.streamlit/
+
+# Keep directory structure
+!data/.gitkeep
+!output/.gitkeep
