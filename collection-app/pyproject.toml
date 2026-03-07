@@ -1,0 +1,13 @@
+[project]
+name = "collection-app"
+version = "0.1.0"
+description = "YouTube Shorts to MJPEG converter for CYD display"
+requires-python = ">=3.12"
+dependencies = [
+    "streamlit>=1.28.0",
+    "yt-dlp>=2024.1.0",
+    "pillow>=10.0.0",
+    "requests>=2.31.0",
+    "pyyaml>=6.0",
+    "google-api-python-client>=2.100.0",
+]

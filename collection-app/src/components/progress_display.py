@@ -9,6 +9,7 @@ from src.services.database import Database
 from src.services.download_service import DownloadService
 from src.services.conversion_service import ConversionService
 from src.services.export_service import ExportService
+from src.services.youtube_service import CUSTOM_COLLECTION_ID
 
 
 def render_download_section(
@@ -28,9 +29,10 @@ def render_download_section(
     st.sidebar.subheader("Download")
 
     # Get selected videos that need downloading
+    shorts_only = channel_id != CUSTOM_COLLECTION_ID
     selected_videos = db.get_videos_with_state(
         channel_id=channel_id,
-        shorts_only=True,
+        shorts_only=shorts_only,
         selected_only=True,
     )
 
@@ -125,9 +127,10 @@ def render_convert_export_section(
     st.sidebar.subheader("Convert & Export")
 
     # Get selected videos that have been downloaded
+    shorts_only = channel_id != CUSTOM_COLLECTION_ID
     selected_videos = db.get_videos_with_state(
         channel_id=channel_id,
-        shorts_only=True,
+        shorts_only=shorts_only,
         selected_only=True,
     )
 

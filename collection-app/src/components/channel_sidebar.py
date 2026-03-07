@@ -70,7 +70,7 @@ def render_channel_sidebar(db: Database, yt_service: YouTubeService) -> Optional
     with st.sidebar.expander("📁 Add Video Links", expanded=False):
         video_links = st.text_area(
             "Paste video URLs (one per line)",
-            placeholder="https://youtube.com/shorts/xxxxx\nhttps://youtu.be/xxxxx",
+            placeholder="https://youtube.com/watch?v=xxxxx\nhttps://youtube.com/shorts/xxxxx\nhttps://youtu.be/xxxxx",
             key="video_links_input",
             height=100,
         )
@@ -90,9 +90,8 @@ def render_channel_sidebar(db: Database, yt_service: YouTubeService) -> Optional
 
                     video = yt_service.get_video_info(link)
                     if video:
-                        # Ensure it's assigned to custom collection and marked as viewable
+                        # Ensure it's assigned to custom collection
                         video.channel_id = CUSTOM_COLLECTION_ID
-                        video.is_short = True  # Always show in grid
                         if db.add_video(video):
                             added += 1
                         else:
@@ -139,7 +138,7 @@ def render_channel_sidebar(db: Database, yt_service: YouTubeService) -> Optional
 
     # Show video counts per channel
     if custom_collection:
-        counts = db.get_video_counts(CUSTOM_COLLECTION_ID)
+        counts = db.get_video_counts(CUSTOM_COLLECTION_ID, shorts_only=False)
         if counts["total"] > 0:
             col1, col2 = st.sidebar.columns([3, 1])
             with col1:

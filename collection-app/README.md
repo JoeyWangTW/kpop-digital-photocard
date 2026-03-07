@@ -15,26 +15,20 @@ Fetch YouTube Shorts from channels and convert them to MJPEG format optimized fo
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/)
 - FFmpeg
-- yt-dlp
 
 ## Installation
 
 1. Clone or download this repository
 
-2. Create a virtual environment:
+2. Install dependencies:
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+uv sync
 ```
 
-3. Install Python dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Install FFmpeg:
+3. Install FFmpeg:
 ```bash
 # macOS
 brew install ffmpeg
@@ -51,7 +45,7 @@ choco install ffmpeg
 Start the application:
 
 ```bash
-streamlit run app.py
+uv run streamlit run app.py
 ```
 
 The app will open in your browser at `http://localhost:8501`.
@@ -87,7 +81,7 @@ The app will open in your browser at `http://localhost:8501`.
 ```
 digital-photocard-collection/
 ├── app.py                  # Streamlit application
-├── requirements.txt        # Python dependencies
+├── pyproject.toml          # Project config and dependencies
 ├── src/
 │   ├── models/            # Data classes
 │   ├── services/          # Business logic

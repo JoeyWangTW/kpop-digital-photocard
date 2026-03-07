@@ -246,14 +246,17 @@ class Database:
                 result.append(VideoWithState(video=video, state=state))
             return result
 
-    def get_video_counts(self, channel_id: Optional[str] = None) -> dict:
+    def get_video_counts(
+        self, channel_id: Optional[str] = None, shorts_only: bool = True
+    ) -> dict:
         """Get counts of videos in different states."""
         with self._get_connection() as conn:
             channel_filter = "AND v.channel_id = ?" if channel_id else ""
+            short_filter = "AND v.is_short = 1" if shorts_only else ""
             params = (channel_id,) if channel_id else ()
 
             total = conn.execute(
-                f"SELECT COUNT(*) FROM videos v WHERE v.is_short = 1 {channel_filter}",
+                f"SELECT COUNT(*) FROM videos v WHERE 1=1 {short_filter} {channel_filter}",
                 params,
             ).fetchone()[0]
 
@@ -261,7 +264,7 @@ class Database:
                 f"""
                 SELECT COUNT(*) FROM videos v
                 JOIN video_state s ON v.id = s.video_id
-                WHERE v.is_short = 1 AND s.is_new = 1 {channel_filter}
+                WHERE s.is_new = 1 {short_filter} {channel_filter}
                 """,
                 params,
             ).fetchone()[0]
@@ -270,7 +273,7 @@ class Database:
                 f"""
                 SELECT COUNT(*) FROM videos v
                 JOIN video_state s ON v.id = s.video_id
-                WHERE v.is_short = 1 AND s.is_selected = 1 {channel_filter}
+                WHERE s.is_selected = 1 {short_filter} {channel_filter}
                 """,
                 params,
             ).fetchone()[0]
@@ -279,7 +282,7 @@ class Database:
                 f"""
                 SELECT COUNT(*) FROM videos v
                 JOIN video_state s ON v.id = s.video_id
-                WHERE v.is_short = 1 AND s.is_converted = 1 {channel_filter}
+                WHERE s.is_converted = 1 {short_filter} {channel_filter}
                 """,
                 params,
             ).fetchone()[0]
@@ -358,72 +361,81 @@ class Database:
         """Update existing video to show in custom collection."""
         with self._get_connection() as conn:
             conn.execute(
-                "UPDATE videos SET channel_id = '__custom__', is_short = 1 WHERE id = ?",
+                "UPDATE videos SET channel_id = '__custom__' WHERE id = ?",
                 (video_id,),
             )
 
-    def select_all_videos(self, channel_id: Optional[str] = None) -> None:
-        """Select all shorts videos."""
+    def select_all_videos(
+        self, channel_id: Optional[str] = None, shorts_only: bool = True
+    ) -> None:
+        """Select all visible videos."""
         with self._get_connection() as conn:
+            short_filter = "AND is_short = 1" if shorts_only else ""
             if channel_id:
                 conn.execute(
-                    """
+                    f"""
                     UPDATE video_state SET is_selected = 1
                     WHERE video_id IN (
-                        SELECT id FROM videos WHERE channel_id = ? AND is_short = 1
+                        SELECT id FROM videos WHERE channel_id = ? {short_filter}
                     )
                     """,
                     (channel_id,),
                 )
             else:
                 conn.execute(
-                    """
+                    f"""
                     UPDATE video_state SET is_selected = 1
-                    WHERE video_id IN (SELECT id FROM videos WHERE is_short = 1)
+                    WHERE video_id IN (SELECT id FROM videos WHERE 1=1 {short_filter})
                     """
                 )
 
-    def deselect_all_videos(self, channel_id: Optional[str] = None) -> None:
-        """Deselect all shorts videos."""
+    def deselect_all_videos(
+        self, channel_id: Optional[str] = None, shorts_only: bool = True
+    ) -> None:
+        """Deselect all visible videos."""
         with self._get_connection() as conn:
+            short_filter = "AND is_short = 1" if shorts_only else ""
             if channel_id:
                 conn.execute(
-                    """
+                    f"""
                     UPDATE video_state SET is_selected = 0
                     WHERE video_id IN (
-                        SELECT id FROM videos WHERE channel_id = ? AND is_short = 1
+                        SELECT id FROM videos WHERE channel_id = ? {short_filter}
                     )
                     """,
                     (channel_id,),
                 )
             else:
                 conn.execute(
-                    """
+                    f"""
                     UPDATE video_state SET is_selected = 0
-                    WHERE video_id IN (SELECT id FROM videos WHERE is_short = 1)
+                    WHERE video_id IN (SELECT id FROM videos WHERE 1=1 {short_filter})
                     """
                 )
 
-    def invert_selection(self, channel_id: Optional[str] = None) -> None:
-        """Invert selection of all shorts videos."""
+    def invert_selection(
+        self, channel_id: Optional[str] = None, shorts_only: bool = True
+    ) -> None:
+        """Invert selection of all visible videos."""
         with self._get_connection() as conn:
+            short_filter = "AND is_short = 1" if shorts_only else ""
             if channel_id:
                 conn.execute(
-                    """
+                    f"""
                     UPDATE video_state
                     SET is_selected = NOT is_selected
                     WHERE video_id IN (
-                        SELECT id FROM videos WHERE channel_id = ? AND is_short = 1
+                        SELECT id FROM videos WHERE channel_id = ? {short_filter}
                     )
                     """,
                     (channel_id,),
                 )
             else:
                 conn.execute(
-                    """
+                    f"""
                     UPDATE video_state
                     SET is_selected = NOT is_selected
-                    WHERE video_id IN (SELECT id FROM videos WHERE is_short = 1)
+                    WHERE video_id IN (SELECT id FROM videos WHERE 1=1 {short_filter})
                     """
                 )
 

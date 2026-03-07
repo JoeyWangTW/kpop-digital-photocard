@@ -3,6 +3,7 @@ from typing import Optional
 
 from src.models.video import VideoWithState
 from src.services.database import Database
+from src.services.youtube_service import CUSTOM_COLLECTION_ID
 from src.utils.thumbnail_cache import ThumbnailCache
 
 # CSS for consistent card styling
@@ -33,10 +34,13 @@ def render_video_grid(
     # Inject CSS
     st.markdown(GRID_CSS, unsafe_allow_html=True)
 
+    # Custom collection shows all videos (including regular/horizontal)
+    shorts_only = channel_id != CUSTOM_COLLECTION_ID
+
     # Get videos
     videos = db.get_videos_with_state(
         channel_id=channel_id,
-        shorts_only=True,
+        shorts_only=shorts_only,
         new_only=new_only,
         selected_only=selected_only,
     )
@@ -59,7 +63,7 @@ def render_video_grid(
         return []
 
     # Stats bar
-    counts = db.get_video_counts(channel_id)
+    counts = db.get_video_counts(channel_id, shorts_only=shorts_only)
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total", counts["total"])
     col2.metric("New", counts["new"])
@@ -72,15 +76,15 @@ def render_video_grid(
     action_cols = st.columns([1, 1, 1, 3])
     with action_cols[0]:
         if st.button("Select All", use_container_width=True):
-            db.select_all_videos(channel_id)
+            db.select_all_videos(channel_id, shorts_only=shorts_only)
             st.rerun()
     with action_cols[1]:
         if st.button("Deselect All", use_container_width=True):
-            db.deselect_all_videos(channel_id)
+            db.deselect_all_videos(channel_id, shorts_only=shorts_only)
             st.rerun()
     with action_cols[2]:
         if st.button("Invert", use_container_width=True):
-            db.invert_selection(channel_id)
+            db.invert_selection(channel_id, shorts_only=shorts_only)
             st.rerun()
 
     st.divider()
@@ -104,7 +108,7 @@ def render_video_grid(
                     thumbnail_url = f"https://i.ytimg.com/vi/{video.id}/hqdefault.jpg"
 
                 # Video URL for linking
-                video_url = f"https://www.youtube.com/shorts/{video.id}"
+                video_url = video.shorts_url if video.is_short else video.youtube_url
 
                 # Try cached thumbnail first
                 cached = thumbnail_cache.get_or_download(video.id, thumbnail_url)
