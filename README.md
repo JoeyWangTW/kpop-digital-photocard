@@ -2,9 +2,11 @@
 
 A handheld device that plays K-pop YouTube Shorts as looping video "photocards" on a small display, powered by an ESP32-S3 with a 2.8" IPS screen.
 
-![Digital photocard playing video](docs/images/photocard.JPG)
-![Back of 3D-printed case](docs/images/back.JPG)
-![CO2 sensor mode](docs/images/co2.JPG)
+<p align="center">
+  <img src="docs/images/photocard.JPG" alt="Digital photocard playing video" width="30%">
+  <img src="docs/images/back.JPG" alt="Back of 3D-printed case" width="30%">
+  <img src="docs/images/co2.JPG" alt="CO2 sensor mode" width="30%">
+</p>
 
 ## Project Structure
 
