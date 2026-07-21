@@ -132,8 +132,11 @@ The video player firmware is based on [esp32-2432S028_video_player](https://gith
 - Insert the SD card and power on the device
 - Videos in `/mjpeg/` loop automatically
 - **Short press** the boot button to skip to the next video
-- **Long press** (1.5s) the boot button to enter deep sleep
-- **Press** the boot button again to wake from sleep
+- **Long press** (1.5s) during video to switch to the CO2/temperature/humidity sensor screen
+- In sensor mode, **short press** returns to video, **long press** (1.5s) powers the device off (deep sleep — the screen turns off as soon as the hold registers)
+- **Press** the boot button to power back on from sleep
+
+There is no hardware power switch on this board, so "off" is ESP32 deep sleep: the display, backlight, audio amp, SD interface, and CO2 sensor are all shut down and the ESP32 draws only a few µA. The remaining floor (~1 mA) comes from always-powered parts (LDO quiescent current, WS2812 LED, SD card standby), which firmware cannot switch off.
 
 ## License
 
