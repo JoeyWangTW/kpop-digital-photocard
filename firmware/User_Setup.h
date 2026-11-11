@@ -44,8 +44,10 @@
 // Use FSPI port (default for ESP32-S3)
 #define USE_FSPI_PORT
 
-// SPI Frequency - 55MHz is a good balance of speed and stability
-#define SPI_FREQUENCY       55000000  // 55 MHz (80MHz can cause noise on some boards)
+// SPI Frequency - the ESP32-S3 can only divide its 80 MHz bus clock by whole
+// numbers, so this request for 55 MHz actually runs at 40 MHz. 80 MHz was
+// tested on this board and corrupts pixel data, so 40 MHz is the ceiling.
+#define SPI_FREQUENCY       55000000  // -> 40 MHz on the wire
 #define SPI_READ_FREQUENCY  16000000  // 16 MHz for reads
 
 // ##################################################################################
