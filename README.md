@@ -116,7 +116,7 @@ The video player firmware is based on [esp32-2432S028_video_player](https://gith
 3. Install **esp32** board package from Board Manager
 4. Install required libraries via Library Manager:
    - **TFT_eSPI**
-   - **TJpg_Decoder**
+   - **JPEGDEC**
 5. Copy `firmware/User_Setup.h` to your TFT_eSPI library folder (replacing the default), or update the pin definitions to match
 6. Open `firmware/esp32s3_video_player.ino` in Arduino IDE
 7. Select board: **ESP32S3 Dev Module**
@@ -134,6 +134,11 @@ The video player firmware is based on [esp32-2432S028_video_player](https://gith
 - **Short press** the boot button to skip to the next video
 - **Long press** (1.5s) the boot button to enter deep sleep
 - **Press** the boot button again to wake from sleep
+
+### Playback and frame rate
+
+- Frames are decoded with JPEGDEC on one core while the other pushes whole frames to the panel, timed against the panel's own scanline so there is no tearing. The firmware slows the panel refresh to ~40-47 Hz and shows each frame for a whole number of refreshes.
+- The ceiling is about **23 fps**: one 240x320 frame takes ~36 ms to send at 40 MHz SPI, and 80 MHz corrupts data on this board. Files encoded faster than that are played in real time by dropping frames evenly. 15 fps files play every frame.
 
 ## License
 
